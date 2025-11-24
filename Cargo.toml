@@ -5,7 +5,7 @@ authors.workspace = true
 edition.workspace = true
 
 [workspace]
-members = ["nanondef-wasm"]
+members = ["nanondef-sys","nanondef-wasm"]
 
 [workspace.package]
 version = "0.1.0"
@@ -22,12 +22,22 @@ tracing = ["dep:tracing"]
 serde = ["dep:serde", "heapless/serde", "wasm-bindgen?/serde", "wasm-bindgen?/serde-serialize"]
 wasm = ["dep:wasm-bindgen"]
 
+nightly_doc = []
+
+_ffi_cbindgen = []
+
 [dependencies]
 tracing = { version = "0.1", features = ["attributes", "tracing-attributes"], default-features = false, optional = true }
+tracing-test = { version = "0.2" }
 thiserror = { version = "2.0" }
+
 derive-new = { version = "0.7" }
-paste = "1.0"
-heapless = { version = "0.9" }
+const_format = "0.2"
+pastey = "0.2"
 
 serde = { version = "1.0", default-features = false, features = ["derive"], optional = true }
 wasm-bindgen = {version = "0.2", default-features = false, optional = true}
+heapless = { version = "0.9" }
+
+[dev-dependencies]
+

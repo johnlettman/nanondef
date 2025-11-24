@@ -1,6 +1,7 @@
-use core::ops::{Bound, Index, IndexMut, RangeBounds};
-use std::cmp::min;
-use std::ops::Add;
+use core::{
+    cmp::min,
+    ops::{Add, Bound, Index, IndexMut, RangeBounds},
+};
 
 /// A half-open range of `usize` values represented as `(start, end)`.
 ///
@@ -29,10 +30,11 @@ pub struct Range {
 }
 
 impl Range {
-    /// Creates a new `Range` with the given inclusive `from` bound and exclusive `to` bound.
+    /// Creates a new `Range` with the given inclusive `from` bound and
+    /// exclusive `to` bound.
     ///
-    /// The caller must ensure that `from <= to`. No bounds checking or validation
-    /// is performed inside this constructor.
+    /// The caller must ensure that `from <= to`. No bounds checking or
+    /// validation is performed inside this constructor.
     ///
     /// # Parameters
     /// - `from`: inclusive start index
@@ -99,10 +101,7 @@ impl Add<Range> for Range {
     type Output = Range;
 
     fn add(self, rhs: Range) -> Self::Output {
-        Self {
-            start: min(self.start, rhs.start),
-            end: self.len() + rhs.len()
-        }
+        Self { start: min(self.start, rhs.start), end: self.len() + rhs.len() }
     }
 }
 
@@ -166,7 +165,7 @@ impl From<(usize, usize)> for Range {
 
 impl From<core::ops::Range<usize>> for Range {
     #[inline(always)]
-    fn from(r: std::ops::Range<usize>) -> Self {
+    fn from(r: core::ops::Range<usize>) -> Self {
         Self::from_core(r)
     }
 }

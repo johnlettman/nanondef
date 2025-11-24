@@ -1,7 +1,7 @@
 pub mod record;
 
 use crate::message::record::Record;
-use nanondef::message;
+use nanondef::tag::message;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 

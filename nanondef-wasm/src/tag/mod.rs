@@ -1,5 +1,5 @@
 use crate::message::Message;
-use nanondef::{self, message, CapabilityContainer};
+use nanondef::tag::{self, message, CapabilityContainer};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -29,22 +29,22 @@ impl<'t> TryFrom<&'t [u8]> for Tag {
     type Error = crate::Error;
 
     fn try_from(bytes: &'t [u8]) -> Result<Self, Self::Error> {
-        Ok(Tag::from(nanondef::Tag::<'t, message::Message<'t>>::try_from(bytes)?))
+        Ok(Tag::from(tag::Tag::<'t, message::Message<'t>>::try_from(bytes)?))
     }
 }
 
-impl<'t> TryFrom<nanondef::RawTag<'t>> for Tag {
+impl<'t> TryFrom<tag::RawTag<'t>> for Tag {
     type Error = crate::Error;
 
     #[inline]
-    fn try_from(t: nanondef::RawTag<'t>) -> Result<Self, Self::Error> {
-        Ok(Tag::from(nanondef::Tag::<'t, message::Message<'t>>::try_from(t)?))
+    fn try_from(t: tag::RawTag<'t>) -> Result<Self, Self::Error> {
+        Ok(Tag::from(tag::Tag::<'t, message::Message<'t>>::try_from(t)?))
     }
 }
 
-impl<'t> From<nanondef::Tag<'t, message::Message<'t>>> for Tag {
+impl<'t> From<tag::Tag<'t, message::Message<'t>>> for Tag {
     #[inline]
-    fn from(t: nanondef::Tag<'t, message::Message<'t>>) -> Self {
+    fn from(t: tag::Tag<'t, message::Message<'t>>) -> Self {
         Self { cc: t.cc.into(), blocks: t.blocks.iter().map(|b| b.into()).collect() }
     }
 }

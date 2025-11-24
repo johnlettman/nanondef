@@ -1,5 +1,4 @@
-use crate::message::DecodeMessage;
-use crate::tlv::BlockTag;
+use crate::tag::{message::DecodeMessage, BlockTag};
 use crate::Range;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

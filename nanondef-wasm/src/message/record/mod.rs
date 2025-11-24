@@ -1,10 +1,10 @@
+mod header;
 mod payload;
 mod raw_record;
 mod record_kind;
 mod record_payload;
-mod header;
 
-use nanondef::message::record;
+use nanondef::tag::message::record;
 pub use raw_record::*;
 pub use record_kind::*;
 pub use record_payload::*;
@@ -15,7 +15,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub struct Record {
-    pub header: record::Header,
+    pub header: record::Flags,
 
     #[wasm_bindgen(getter_with_clone)]
     pub ty: String,

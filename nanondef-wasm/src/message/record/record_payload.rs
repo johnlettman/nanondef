@@ -27,8 +27,8 @@ impl From<&record::RawRecord<'_>> for RecordPayload {
     }
 }
 
-impl<'r> From<&record::PayloadRecord<'r, payload::UriPayload<'r>>> for RecordPayload {
-    fn from(r: &record::PayloadRecord<'r, payload::UriPayload<'r>>) -> Self {
+impl<'r> From<&record::Data<'r, payload::UriPayload<'r>>> for RecordPayload {
+    fn from(r: &record::Data<'r, payload::UriPayload<'r>>) -> Self {
         Self { kind: RecordKind::Uri, raw: None, uri: Some((&r.payload).into()) }
     }
 }

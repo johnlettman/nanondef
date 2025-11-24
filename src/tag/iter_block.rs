@@ -1,16 +1,17 @@
-use crate::message::DecodeMessage;
-use crate::tlv::block::Block;
-use crate::{tlv::BlockTag, error::Truncated, Range};
+use crate::{
+    error::Truncated, Error, Error::BlockTruncated, Range,
+};
+use crate::tag::{message::DecodeMessage, Block, BlockTag};
 use core::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct BlockIter<'b, M: DecodeMessage<'b>> {
+pub struct IterBlock<'b, M: DecodeMessage<'b>> {
     bytes: &'b [u8],
     pos: usize,
     _marker: PhantomData<M>,
 }
 
-impl<'b, M: DecodeMessage<'b>> BlockIter<'b, M> {
+impl<'b, M: DecodeMessage<'b>> IterBlock<'b, M> {
     #[inline]
     pub fn new(bytes: &'b [u8]) -> Self {
         Self { bytes, pos: 0, _marker: PhantomData }
@@ -20,7 +21,7 @@ impl<'b, M: DecodeMessage<'b>> BlockIter<'b, M> {
     fn read_len(&mut self) -> crate::Result<usize> {
         let len = self.bytes.len();
         if self.pos >= len {
-            return Err(crate::Error::BlockTruncated(Truncated { len, want: self.pos + 1 }));
+            return Err(BlockTruncated(Truncated { got: len, want: self.pos + 1 }));
         }
 
         let first = self.bytes[self.pos];
@@ -31,7 +32,7 @@ impl<'b, M: DecodeMessage<'b>> BlockIter<'b, M> {
         }
 
         if self.pos + 1 >= len {
-            return Err(crate::Error::BlockTruncated(Truncated { len, want: self.pos + 2 }));
+            return Err(BlockTruncated(Truncated { got: len, want: self.pos + 2 }));
         }
 
         let hi = self.bytes[self.pos] as usize;
@@ -42,17 +43,10 @@ impl<'b, M: DecodeMessage<'b>> BlockIter<'b, M> {
     }
 }
 
-impl<'b, M: DecodeMessage<'b>> Iterator for BlockIter<'b, M> {
+impl<'b, M: DecodeMessage<'b>> Iterator for IterBlock<'b, M> {
     type Item = crate::Result<Block<'b, M>>;
 
-    #[cfg_attr(feature = "tracing",
-        tracing::instrument(
-            level = "trace",
-            ret,
-            skip(self),
-            fields(bytes = %crate::tracing::TruncatedBytes::<10>(self.bytes))
-        )
-    )]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "trace", ret, skip(self),))]
     fn next(&mut self) -> Option<Self::Item> {
         let bytes = self.bytes;
         let len = bytes.len();
@@ -103,15 +97,13 @@ impl<'b, M: DecodeMessage<'b>> Iterator for BlockIter<'b, M> {
                     #[cfg(feature = "tracing")]
                     tracing::warn!("Message TLV end exceeds {len} available bytes");
 
-                    return Some(Err(crate::Error::BlockTruncated(Truncated {
-                        len,
+                    return Some(Err(BlockTruncated(Truncated {
+                        got: len,
                         want: block_range.end,
                     })));
                 }
 
-                match M::decode_message(&bytes[block_range])
-                    .map_err(crate::Error::message_error::<M>)
-                {
+                match M::decode_message(&bytes[block_range]).map_err(Error::implementation_error) {
                     Ok(message) => Some(Ok(Block::Message(message, block_range))),
                     Err(e) => Some(Err(e)),
                 }
@@ -127,30 +119,29 @@ impl<'b, M: DecodeMessage<'b>> Iterator for BlockIter<'b, M> {
                     Err(e) => return Some(Err(e)),
                 };
 
-                let block_start = self.pos;
-                let block_end = self.pos + block_len;
+                let block_range = Range::new(self.pos, self.pos + block_len);
 
                 #[cfg(feature = "tracing")]
-                tracing::debug!(block_start, block_end, block_len, "Unknown TLV range calculated");
+                tracing::debug!(%block_range, "Unknown TLV range calculated");
 
-                if block_end > len {
+                if block_range.end > len {
                     #[cfg(feature = "tracing")]
-                    tracing::warn!("Unknown TLV end of {block_end} exceeds {len} available bytes");
+                    tracing::warn!("Unknown TLV end exceeds {len} available bytes");
 
-                    return Some(Err(crate::Error::BlockTruncated(Truncated {
-                        len,
-                        want: block_end,
+                    return Some(Err(BlockTruncated(Truncated {
+                        got: len,
+                        want: block_range.end,
                     })));
                 }
 
                 Some(Ok(match tag {
                     BlockTag::Proprietary => {
-                        Block::Proprietary(&bytes[block_start..block_end], (block_start, block_end))
+                        Block::Proprietary(&bytes[block_range.as_core()], block_range)
                     },
                     BlockTag::Other(_) => {
-                        Block::Other(tag, &bytes[block_start..block_end], (block_start, block_end))
+                        Block::Other(tag, &bytes[block_range.as_core()], block_range)
                     },
-                    _ => unreachable!("shouldn't reach here with unknown tag")
+                    _ => unreachable!("shouldn't reach here with unknown tag"),
                 }))
             },
         }

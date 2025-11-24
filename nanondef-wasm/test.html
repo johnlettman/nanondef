@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>wasm test</title>
+</head>
+<body>
+<script type="module">
+    import init, * as nanondef from './pkg/nanondef_wasm.js';
+
+    async function run() {
+        // Initialize WASM module; resolves after WASM is loaded and ready.
+        await init();
+
+        // Attach all exports from nanondef_wasm.js to the window object
+        window.nanondef = nanondef;
+
+        console.log("WASM loaded. All exports attached to window.nanondef");
+
+        // Example: You can now refer to window.nanondef.Tag, window.nanondef.decode, etc.
+        // Demo loading file and calling decode
+        const resp = await fetch("tag.bin");
+        const bytes = new Uint8Array(await resp.arrayBuffer());
+
+        // Example: Use Tag.decode if it's a static/class method
+        // If decode is a static method: nanondef.Tag.decode(bytes)
+        // If decode is a function: nanondef.decode(bytes)
+
+        if (window.nanondef.Tag && typeof window.nanondef.Tag.decode === 'function') {
+            window.tag = window.nanondef.Tag.decode(bytes);
+            console.log("Decoded tag:", window.tag);
+        } else {
+            console.log("Tag or Tag.decode not available in nanondef exports");
+        }
+    }
+
+    run();
+</script>
+</body>
+</html>

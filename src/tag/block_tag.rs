@@ -1,5 +1,4 @@
 use core::fmt::Formatter;
-use tracing::field::{Field, Visit};
 
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

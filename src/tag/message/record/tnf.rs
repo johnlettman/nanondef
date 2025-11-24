@@ -1,4 +1,4 @@
-use crate::message::record::flags;
+use crate::tag::message::record::Flags;
 
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,7 +61,7 @@ impl core::fmt::Display for Tnf {
 
 impl From<u8> for Tnf {
     fn from(v: u8) -> Self {
-        match v & flags::TNF_MASK {
+        match v & Flags::TNF_MASK {
             0 => Tnf::Empty,
             1 => Tnf::WellKnown,
             2 => Tnf::MimeMedia,
