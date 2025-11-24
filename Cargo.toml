@@ -15,7 +15,7 @@ repository.workspace = true
 members = ["nanondef-sys","nanondef-wasm"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.0.1"
 authors = ["John P. Lettman <the@johnlettman.com>"]
 edition = "2021"
 categories = ["encoding", "no-std", "no-std::no-alloc", "embedded", "wasm"]

@@ -317,7 +317,7 @@ checksum = "f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273"
 
 [[package]]
 name = "nanondef"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "const_format",
  "derive-new",
@@ -332,7 +332,7 @@ dependencies = [
 
 [[package]]
 name = "nanondef-sys"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "cbindgen",
  "nanondef",
@@ -340,7 +340,7 @@ dependencies = [
 
 [[package]]
 name = "nanondef-wasm"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "console_error_panic_hook",
  "js-sys",
