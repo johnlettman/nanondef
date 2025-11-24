@@ -1,8 +1,15 @@
 [package]
 name = "nanondef"
+description = "A no-std, no-alloc, minimal NDEF encoding and decoding library."
+readme = "README.md"
+license-file = "LICENSE"
+
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
+categories.workspace = true
+keywords.workspace = true
+repository.workspace = true
 
 [workspace]
 members = ["nanondef-sys","nanondef-wasm"]
@@ -11,6 +18,9 @@ members = ["nanondef-sys","nanondef-wasm"]
 version = "0.1.0"
 authors = ["John P. Lettman <the@johnlettman.com>"]
 edition = "2021"
+categories = ["encoding", "no-std", "no-std::no-alloc", "embedded", "wasm"]
+keywords = ["nfc", "ndef"]
+repository = "https://github.com/johnlettman/nanondef"
 
 [features]
 default = ["std", "serde", "tracing"]
